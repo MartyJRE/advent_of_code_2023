@@ -82,7 +82,6 @@ fun main() {
         val iterator = input.iterator()
         while (iterator.hasNext()) {
             var currentLine = iterator.next()
-            currentLine.println()
             // walk the string left to right
             var idx = 0
             while (idx <= currentLine.length) {
@@ -99,7 +98,7 @@ fun main() {
                      *
                      * Example:
                      *
-                     * twone
+                     * Input: `twone`
                      *  | twone
                      * t | wone
                      * tw | one
@@ -121,6 +120,7 @@ fun main() {
                      *
                      * If I only replaced the string digit with its integer value, I would get the following:
                      *
+                     * Input: `twone`
                      *  | twone
                      * t | wone
                      * tw | one
@@ -146,7 +146,6 @@ fun main() {
                     idx += 1
                 }
             }
-            currentLine.println()
             total += currentLine.calibration()
         }
         return total
@@ -181,6 +180,6 @@ fun main() {
     check(part2(testInput2) == 281)
 
     val input = readInput("Day01")
-    part1(input).println()
-    part2(input).println()
+    "Result of part 1:\nSum of edge digits: ${part1(input)}\n".println()
+    "Result of part 2:\nSum of edge digits: ${part2(input)}\n".println()
 }
