@@ -5,8 +5,9 @@ fun String.calibration(): Int {
         // did not find either one of the digits
         return 0
     }
+    val charArray = toCharArray()
     // the indices can overlap, when there's only one digit, this is ok and desired
-    return "${toCharArray()[firstIndex]}${toCharArray()[lastIndex]}".toIntOrNull() ?: 0
+    return "${charArray[firstIndex]}${charArray[lastIndex]}".toIntOrNull() ?: 0
 }
 
 fun main() {
