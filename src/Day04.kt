@@ -137,6 +137,6 @@ fun main() {
     check(part2(testInput2) == 30)
 
     val input = readInput("Day04")
-    part1(input).println()
-    part2(input).println()
+    "Result of part 1:\nScratch cards value: ${part1(input)}\n".println()
+    "Result of part 2:\nTotal scratch cards: ${part2(input)}\n".println()
 }
