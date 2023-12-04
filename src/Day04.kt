@@ -118,12 +118,10 @@ fun main() {
             }
         }
         for ((id, value) in map) {
-            for (a in 0..<value.first) {
-                for (otherId in id + 1..(id + value.second).coerceAtMost(input.size)) {
-                    val other = map[otherId]
-                    if (other != null) {
-                        map[otherId] = Pair(other.first + 1, other.second)
-                    }
+            for (otherId in id + 1..(id + value.second).coerceAtMost(input.size)) {
+                val other = map[otherId]
+                if (other != null) {
+                    map[otherId] = Pair(other.first + (0..<value.first).count(), other.second)
                 }
             }
         }
