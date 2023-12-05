@@ -1,4 +1,50 @@
-fun main() {
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+
+suspend fun main() {
+    fun parseSeeds(input: String): ArrayList<Long> {
+        val seeds = ArrayList<Long>()
+        for (match in Regex("""seeds: (.*)""").findAll(input)) {
+            seeds += match.groupValues[1].split(' ').map {
+                it.trim().toLong()
+            }
+        }
+        return seeds
+    }
+
+    fun parseSeedRanges(input: String): ArrayList<Pair<Long, Long>> {
+        val seedNums = ArrayList<Long>()
+        for (match in Regex("""seeds: (.*)""").findAll(input)) {
+            seedNums += match.groupValues[1].split(' ').map {
+                it.trim().toLong()
+            }
+        }
+        val seedRanges = ArrayList<Pair<Long, Long>>()
+        for (idx in (0..<seedNums.size).step(2)) {
+            seedRanges.add(Pair(seedNums[idx], seedNums[idx + 1]))
+        }
+        return seedRanges
+    }
+
+    fun parseMap(input: String, name: String): ArrayList<Triple<Long, Long, Long>> {
+        val ranges = ArrayList<Triple<Long, Long, Long>>()
+        for (match in Regex("""$name map:((\n((\d| )+))+)""").findAll(input)) {
+            for (split in match.groupValues[1].trim().split('\n')) {
+                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toLong() }
+                ranges.add(Triple(sourceRangeStart, destRangeStart, rangeLength))
+            }
+        }
+        return ranges
+    }
+
+    fun ArrayList<Triple<Long, Long, Long>>.getOther(value: Long): Long {
+        val needle = find { it.first <= value && value < (it.first + it.third) } ?: return value
+        val offset = (value - needle.first)
+        val position = needle.second + offset
+        return position
+    }
+
     /**
      * --- Day 5: If You Give A Seed A Fertilizer ---
      *
@@ -101,107 +147,87 @@ fun main() {
      *
      * What is the lowest location number that corresponds to any of the initial seed numbers?
      */
-    fun part1(input: String): UInt {
-        val seeds = ArrayList<UInt>()
-        for (match in Regex("""seeds: (.*)""").findAll(input)) {
-            seeds += match.groupValues[1].split(' ').map {
-                it.trim().toUInt()
-            }
-        }
+    fun part1(input: String): Long {
+        val seeds = parseSeeds(input)
 
-        val seedToSoilMap = HashMap<UInt, UInt>()
-        for (match in Regex("""seed-to-soil map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    seedToSoilMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
+        val seedToSoil = parseMap(input, "seed-to-soil")
+        val soilToFertilizer = parseMap(input, "soil-to-fertilizer")
+        val fertilizerToWater = parseMap(input, "fertilizer-to-water")
+        val waterToLight = parseMap(input, "water-to-light")
+        val lightToTemperature = parseMap(input, "light-to-temperature")
+        val temperatureToHumidity = parseMap(input, "temperature-to-humidity")
+        val humidityToLocation = parseMap(input, "humidity-to-location")
 
-        val soilToFertilizerMap = HashMap<UInt, UInt>()
-        for (match in Regex("""soil-to-fertilizer map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    soilToFertilizerMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
+        val min = seeds.minOf {
+            val soil = seedToSoil.getOther(it)
+            val fertilizer = soilToFertilizer.getOther(soil)
+            val water = fertilizerToWater.getOther(fertilizer)
+            val light = waterToLight.getOther(water)
+            val temperature = lightToTemperature.getOther(light)
+            val humidity = temperatureToHumidity.getOther(temperature)
+            humidityToLocation.getOther(humidity)
         }
-
-        val fertilizerToWaterMap = HashMap<UInt, UInt>()
-        for (match in Regex("""fertilizer-to-water map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    fertilizerToWaterMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
-
-        val waterToLightMap = HashMap<UInt, UInt>()
-        for (match in Regex("""water-to-light map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    waterToLightMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
-
-        val lightToTemperatureMap = HashMap<UInt, UInt>()
-        for (match in Regex("""light-to-temperature map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    lightToTemperatureMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
-
-        val temperatureToHumidityMap = HashMap<UInt, UInt>()
-        for (match in Regex("""temperature-to-humidity map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    temperatureToHumidityMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
-
-        val humidityToLocationMap = HashMap<UInt, UInt>()
-        for (match in Regex("""humidity-to-location map:((\n((\d| )+))+)""").findAll(input)) {
-            for (split in match.groupValues[1].trim().split('\n')) {
-                val (destRangeStart, sourceRangeStart, rangeLength) = split.split(' ').map { it.trim().toUInt() }
-                for (idx in 0..<rangeLength.toLong()) {
-                    humidityToLocationMap[sourceRangeStart + idx.toUInt()] = destRangeStart + idx.toUInt()
-                }
-            }
-        }
-
-        return seeds.minOf {
-            val soil = seedToSoilMap[it] ?: it
-            val fertilizer = soilToFertilizerMap[soil] ?: soil
-            val water = fertilizerToWaterMap[fertilizer] ?: fertilizer
-            val light = waterToLightMap[water] ?: water
-            val temperature = lightToTemperatureMap[light] ?: light
-            val humidity = temperatureToHumidityMap[temperature] ?: temperature
-            val location = humidityToLocationMap[humidity] ?: humidity
-            location
-        }
+        return min
     }
 
-    fun part2(input: List<String>): Int {
-        return input.size
+
+    /**
+     * --- Part Two ---
+     *
+     * Everyone will starve if you only plant such a small number of seeds. Re-reading the almanac, it looks like the seeds: line actually describes ranges of seed numbers.
+     *
+     * The values on the initial seeds: line come in pairs. Within each pair, the first value is the start of the range and the second value is the length of the range. So, in the first line of the example above:
+     *
+     * seeds: 79 14 55 13
+     *
+     * This line describes two ranges of seed numbers to be planted in the garden. The first range starts with seed number 79 and contains 14 values: 79, 80, ..., 91, 92. The second range starts with seed number 55 and contains 13 values: 55, 56, ..., 66, 67.
+     *
+     * Now, rather than considering four seed numbers, you need to consider a total of 27 seed numbers.
+     *
+     * In the above example, the lowest location number can be obtained from seed number 82, which corresponds to soil 84, fertilizer 84, water 84, light 77, temperature 45, humidity 46, and location 46. So, the lowest location number is 46.
+     *
+     * Consider all of the initial seed numbers listed in the ranges on the first line of the almanac. What is the lowest location number that corresponds to any of the initial seed numbers?
+     */
+    suspend fun part2(input: String): Long {
+        val seedRanges = parseSeedRanges(input)
+
+        val seedToSoil = parseMap(input, "seed-to-soil")
+        val soilToFertilizer = parseMap(input, "soil-to-fertilizer")
+        val fertilizerToWater = parseMap(input, "fertilizer-to-water")
+        val waterToLight = parseMap(input, "water-to-light")
+        val lightToTemperature = parseMap(input, "light-to-temperature")
+        val temperatureToHumidity = parseMap(input, "temperature-to-humidity")
+        val humidityToLocation = parseMap(input, "humidity-to-location")
+
+        var lowest = Long.MAX_VALUE
+        coroutineScope {
+            seedRanges.map { range ->
+                async {
+                    for (seed in range.first..range.first + range.second) {
+                        val soil = seedToSoil.getOther(seed)
+                        val fertilizer = soilToFertilizer.getOther(soil)
+                        val water = fertilizerToWater.getOther(fertilizer)
+                        val light = waterToLight.getOther(water)
+                        val temperature = lightToTemperature.getOther(light)
+                        val humidity = temperatureToHumidity.getOther(temperature)
+                        val location = humidityToLocation.getOther(humidity)
+                        if (location < lowest) {
+                            lowest = location
+                        }
+                    }
+                }
+            }.awaitAll()
+        }
+        return lowest
     }
 
     val testInput1 = readInput("Day05_test_part1")
-    check(part1(testInput1) == 35.toUInt())
+    check(part1(testInput1) == 35L)
 
-//    val testInput2 = readInputLines("Day05_test_part2")
-//    check(part2(testInput2) == 1)
-//
+    val testInput2 = readInput("Day05_test_part2")
+    check(part2(testInput2) == 46L)
+
     val input = readInput("Day05")
     "Result of part 1:\nLowest location: ${part1(input)}\n".println()
-//    part2(input).println()
+    "Result of part 2:\nLowest location: ${part2(input)}\n".println()
 }
