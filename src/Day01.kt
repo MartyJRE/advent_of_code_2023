@@ -68,16 +68,16 @@ fun main() {
      */
     fun part2(input: List<String>): Int {
         val digitMap = mapOf(
-                // "zero" to 0, // Don't include 0, it wasn't in the description
-                "one" to 1,
-                "two" to 2,
-                "three" to 3,
-                "four" to 4,
-                "five" to 5,
-                "six" to 6,
-                "seven" to 7,
-                "eight" to 8,
-                "nine" to 9
+            // "zero" to 0, // Don't include 0, it wasn't in the description
+            "one" to 1,
+            "two" to 2,
+            "three" to 3,
+            "four" to 4,
+            "five" to 5,
+            "six" to 6,
+            "seven" to 7,
+            "eight" to 8,
+            "nine" to 9
         )
         var total = 0
         val iterator = input.iterator()
@@ -162,7 +162,7 @@ fun main() {
      *
      * In this example, the calibration values of these four lines are 12, 38, 15, and 77. Adding these together produces 142.
      */
-    val testInput1 = readInput("Day01_test_part1")
+    val testInput1 = readInputLines("Day01_test_part1")
     check(part1(testInput1) == 142)
     /**
      * Equipped with this new information, you now need to find the real first and last digit on each line. For example:
@@ -177,10 +177,10 @@ fun main() {
      *
      * In this example, the calibration values are 29, 83, 13, 24, 42, 14, and 76. Adding these together produces 281.
      */
-    val testInput2 = readInput("Day01_test_part2")
+    val testInput2 = readInputLines("Day01_test_part2")
     check(part2(testInput2) == 281)
 
-    val input = readInput("Day01")
+    val input = readInputLines("Day01")
     "Result of part 1:\nSum of edge digits: ${part1(input)}\n".println()
     "Result of part 2:\nSum of edge digits: ${part2(input)}\n".println()
 }

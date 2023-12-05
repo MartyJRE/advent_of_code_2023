@@ -128,13 +128,13 @@ fun main() {
         return map.values.sumOf { it.first }
     }
 
-    val testInput1 = readInput("Day04_test_part1")
+    val testInput1 = readInputLines("Day04_test_part1")
     check(part1(testInput1) == 13)
 
-    val testInput2 = readInput("Day04_test_part2")
+    val testInput2 = readInputLines("Day04_test_part2")
     check(part2(testInput2) == 30)
 
-    val input = readInput("Day04")
+    val input = readInputLines("Day04")
     "Result of part 1:\nScratch cards value: ${part1(input)}\n".println()
     "Result of part 2:\nTotal scratch cards: ${part2(input)}\n".println()
 }

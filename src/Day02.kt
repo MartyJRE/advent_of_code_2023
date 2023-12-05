@@ -4,25 +4,25 @@ class GameSet(input: String) {
     val red: Int?
         get() {
             return parts
-                    .find { it.contains("red") }
-                    ?.replace(" red", "")
-                    ?.toIntOrNull()
+                .find { it.contains("red") }
+                ?.replace(" red", "")
+                ?.toIntOrNull()
         }
 
     val green: Int?
         get() {
             return parts
-                    .find { it.contains("green") }
-                    ?.replace(" green", "")
-                    ?.toIntOrNull()
+                .find { it.contains("green") }
+                ?.replace(" green", "")
+                ?.toIntOrNull()
         }
 
     val blue: Int?
         get() {
             return parts
-                    .find { it.contains("blue") }
-                    ?.replace(" blue", "")
-                    ?.toIntOrNull()
+                .find { it.contains("blue") }
+                ?.replace(" blue", "")
+                ?.toIntOrNull()
         }
 
     init {
@@ -157,13 +157,13 @@ fun main() {
         return sum
     }
 
-    val testInput1 = readInput("Day02_test_part1")
+    val testInput1 = readInputLines("Day02_test_part1")
     check(part1(testInput1) == 8)
 
-    val testInput2 = readInput("Day02_test_part2")
+    val testInput2 = readInputLines("Day02_test_part2")
     check(part2(testInput2) == 2286)
 
-    val input = readInput("Day02")
+    val input = readInputLines("Day02")
     "Result of part 1:\nSum of possible games: ${part1(input)}\n".println()
     "Result of part 2:\nSum of powers of min cubes: ${part2(input)}\n".println()
 }

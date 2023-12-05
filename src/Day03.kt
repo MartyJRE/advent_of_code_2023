@@ -128,13 +128,13 @@ fun main() {
         return sum
     }
 
-    val testInput1 = readInput("Day03_test_part1")
+    val testInput1 = readInputLines("Day03_test_part1")
     check(part1(testInput1) == 4361)
 
-    val testInput2 = readInput("Day03_test_part2")
+    val testInput2 = readInputLines("Day03_test_part2")
     check(part2(testInput2) == 467835)
 
-    val input = readInput("Day03")
+    val input = readInputLines("Day03")
     part1(input).println()
     part2(input).println()
 }
