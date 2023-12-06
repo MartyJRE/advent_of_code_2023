@@ -1,4 +1,17 @@
 fun main() {
+    fun String.combineToLong(): Long {
+        return substringAfter(':')
+            .replace(" ", "")
+            .toLong()
+    }
+
+    fun String.getIntegers(): List<Int> {
+        return substringAfter(':')
+            .split(Regex(""" +"""))
+            .filter { it.isNotBlank() }
+            .map { it.toInt() }
+    }
+
     /**
      * --- Day 6: Wait For It ---
      *
@@ -47,16 +60,8 @@ fun main() {
      * Determine the number of ways you could beat the record in each race. What do you get if you multiply these numbers together?
      */
     fun part1(input: List<String>): Int {
-        val times = input[0]
-            .substringAfter(':')
-            .split(Regex(""" +"""))
-            .filter { it.isNotBlank() }
-            .map { it.toInt() }
-        val distances = input[1]
-            .substringAfter(':')
-            .split(Regex(""" +"""))
-            .filter { it.isNotBlank() }
-            .map { it.toInt() }
+        val times = input[0].getIntegers()
+        val distances = input[1].getIntegers()
         if (times.size != distances.size) {
             return -1
         }
@@ -95,20 +100,14 @@ fun main() {
      * How many ways can you beat the record in this one much longer race?
      */
     fun part2(input: List<String>): Long {
-        val time = input[0]
-            .substringAfter(':')
-            .replace(" ", "")
-            .toLong()
-        val distance = input[1]
-            .substringAfter(':')
-            .replace(" ", "")
-            .toLong()
+        val time = input[0].combineToLong()
+        val distance = input[1].combineToLong()
         var possibleWins = 0L
         for (windup in 0..time) {
             val remainingTime = time - windup
             val distTraveled = remainingTime * windup
             if (distTraveled > distance) {
-                possibleWins += 1
+                possibleWins += 1L
             }
         }
         return possibleWins
@@ -121,6 +120,6 @@ fun main() {
     check(part2(testInput2) == 71503L)
 
     val input = readInputLines("Day06")
-    part1(input).println()
-    part2(input).println()
+    "Result of part 1:\nPossible wins: ${part1(input)}\n".println()
+    "Result of part 2:\nPossible wins: ${part2(input)}\n".println()
 }
