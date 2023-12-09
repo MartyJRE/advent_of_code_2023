@@ -1,7 +1,3 @@
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
-
 fun main() {
     data class LR<T>(val left: T, val right: T)
 
@@ -117,16 +113,53 @@ fun main() {
      *
      * Simultaneously start on every node that ends with A. How many steps does it take before you're only on nodes that end with Z?
      */
+    val reggie = Regex("""(\w+) = \((\w+), (\w+)\)""")
+
     fun part2(input: List<String>): Long {
-        println("I failed :(")
-        return 0L
+        val values =
+            input.drop(2).map { reggie.findAll(it).flatMap { match -> match.groupValues.drop(1) } }.flatMap { it }
+        val map = values.indices.step(3).associate {
+            values[it] to Pair(values[it + 1], values[it + 2])
+        }.toMutableMap()
+
+        val path = input[0]
+        val currentKeys = map.keys.filter { it.endsWith('A') }.toTypedArray()
+        val all = currentKeys.map {
+            var current = it
+            var steps = 0L
+            while (!current.endsWith('Z')) {
+                for (char in path) {
+                    steps++
+                    current = if (char == 'L') map.getValue(current).first else map.getValue(current).second
+                }
+            }
+            steps
+        }
+
+        /**
+         * Lowest common multiple
+         * https://www.baeldung.com/kotlin/lcm
+         */
+        fun lowestCommonMultiple(acc: Long, i: Long): Long {
+            val l = if (acc > i) acc else i
+            val max = acc * i
+            var lcm = l
+            while (lcm <= max) {
+                if (lcm % acc == 0L && lcm % i == 0L) {
+                    return lcm
+                }
+                lcm += l
+            }
+            return max
+        }
+        return all.reduce { acc, i -> lowestCommonMultiple(acc, i) }
     }
 
     val testInput1 = readInputLines("Day08_test_part1")
     check(part1(testInput1) == 2)
 
-//    val testInput2 = readInputLines("Day08_test_part2")
-//    check(part2(testInput2) == 6L)
+    val testInput2 = readInputLines("Day08_test_part2")
+    check(part2(testInput2) == 6L)
 
     val input = readInputLines("Day08")
     "Result of part 1:\nSteps to ZZZ: ${part1(input)}\n".println()
